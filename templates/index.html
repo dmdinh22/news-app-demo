@@ -8,16 +8,16 @@
     </head>
     <body>
         <nav>
-                <a href="http://first-news-app.readthedocs.org/">
-                    <img src="{{ url_for('static', filename='irelogo.png') }}">
-                </a>
-            </nav>
-            <header>
-                <h1>These are the 60 people who died during the L.A. riots</h1>
-            </header>
+            <a href="javascript:history.back()">
+                <img src="{{ url_for('static', filename='irelogo.png') }}">
+            </a>
+        </nav>
+        <header>
+            <h1>These are the 60 people who died during the L.A. riots</h1>
+        </header><!--header-->
         <div id="map" style="width:100%; height:300px;"></div>
         <h1>LA Riot Deaths</h1>
-        <table border=1 cellpadding=7>
+        <table border=1 cellpadding=7 id="riotDeaths">
             <tr>
                 <th>Name</th>
                 <th>Date</th>
@@ -38,51 +38,57 @@
                 <td>{{ obj.race }}</td>
             </tr>
             {% endfor %}
-        </table>
-        <script type="text/javascript">
-            var map = L.map('map').setView([34.055, -118.35], 9);
-            var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: 'Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>.'
-            });
-            map.addLayer(osmLayer);
-            var data = {
-                "type": "FeatureCollection",
-                "features": [
-                  {% for obj in object_list %}
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "full_name": "{{ obj.full_name }}",
-                      "id": "{{ obj.id }}"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [{{ obj.x }}, {{ obj.y }}]
-                    }
-                  }{% if not loop.last %},{% endif %}
-                  {% endfor %}
-                ]
-              };
-              var blackIcon = L.Icon.extend({
-                    options: {
-                        iconUrl: "{{ url_for('static', filename='marker-24.png') }}",
-                        iconSize: [24, 24]
-                    }
-                });
-              var dataLayer = L.geoJson(data, {
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng, {icon: new blackIcon()});
-                },
-                onEachFeature: function(feature, layer) {
-                    layer.bindPopup(
-                        '<a href="' + feature.properties.id + '/">' +
-                            feature.properties.full_name +
-                        '</a>'
-                    );
-                }
-            });
-            map.addLayer(dataLayer);
-        </script>
+        </table><!--riotDeaths-->
     </body>
 </html>
+
+<!--JS-->
+<script type="text/javascript">
+    var map = L.map('map').setView([34.055, -118.35], 9);
+    var osmLayer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: 'Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>.'
+    });
+    map.addLayer(osmLayer);
+    // data for map
+    var data = {
+        "type": "FeatureCollection",
+        "features": [
+            //iterate over objects from object list
+            {% for obj in object_list %}
+            {
+            "type": "Feature",
+            "properties": {
+                "full_name": "{{ obj.full_name }}",
+                "id": "{{ obj.id }}"
+            },
+            "geometry": {
+                "type": "Point",
+                //coords from object
+                "coordinates": [{{ obj.x }}, {{ obj.y }}]
+            }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+        };
+        // set black marker
+        var blackIcon = L.Icon.extend({
+            options: {
+                iconUrl: "{{ url_for('static', filename='marker-24.png') }}",
+                iconSize: [24, 24]
+            }
+        });
+        var dataLayer = L.geoJson(data, {
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {icon: new blackIcon()});
+        },
+        onEachFeature: function(feature, layer) {
+            layer.bindPopup(
+                '<a href="' + feature.properties.id + '/">' +
+                    feature.properties.full_name +
+                '</a>'
+            );
+        }
+    });
+    map.addLayer(dataLayer);
+</script>

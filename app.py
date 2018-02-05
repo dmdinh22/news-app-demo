@@ -23,12 +23,12 @@ def index():
 @app.route('/<row_id>/')
 def detail(row_id):
     template = 'detail.html'
-    object_list = get_csv()
-    for row in object_list:
-        if row['id'] == row_id:
-            return render_template(template, object=row)
+    object_list = get_csv() # pull csv data into detail function
+    for row in object_list: #iterate over every row
+        if row['id'] == row_id: # if row matches the id from uri
+            return render_template(template, object=row) #return matching obj
     abort(404)
-    
+
 if __name__ == '__main__':
     # fire up flask server
     app.run(debug=True, use_reloader=True)
