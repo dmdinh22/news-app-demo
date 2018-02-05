@@ -16,7 +16,15 @@ def index():
     template = 'index.html'
     object_list = get_csv() # pull csv data into index
     return render_template(template, object_list=object_list) #pass into template
-
+# route to each individual id from csv to open detailed page
+@app.route('/<row_id>/')
+def detail(row_id):
+    template = 'detail.html'
+    object_list = get_csv()
+    for row in object_list:
+        if row['id'] == row_id:
+            return render_template(template, object=row)
+    return render_template(template, row_id=row_id)
 if __name__ == '__main__':
     # fire up flask server
     app.run(debug=True, use_reloader=True)
