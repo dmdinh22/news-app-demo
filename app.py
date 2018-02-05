@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from flask import abort
 import csv
 
 app = Flask(__name__)
@@ -10,12 +11,14 @@ def get_csv():
     csv_obj = csv.DictReader(csv_file) #parse as dictionary obj
     csv_list = list(csv_obj) #convert to list to not lose objects once used
     return csv_list
+
 #method to return index
 @app.route("/")
 def index():
     template = 'index.html'
     object_list = get_csv() # pull csv data into index
     return render_template(template, object_list=object_list) #pass into template
+
 # route to each individual id from csv to open detailed page
 @app.route('/<row_id>/')
 def detail(row_id):
@@ -24,7 +27,8 @@ def detail(row_id):
     for row in object_list:
         if row['id'] == row_id:
             return render_template(template, object=row)
-    return render_template(template, row_id=row_id)
+    abort(404)
+    
 if __name__ == '__main__':
     # fire up flask server
     app.run(debug=True, use_reloader=True)
